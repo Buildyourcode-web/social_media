@@ -71,4 +71,8 @@ const loginUserService = async(data) => {
     return { status: 200, success: true, message: 'Login Successful', token, userData };
 }
 
-module.exports = { registerUserService, vrfyEmailService, loginUserService }
+const getProfileDetailsService = async (userId) => {
+  return await userModel.findById(userId).select("-password -otp -__v");
+};
+
+module.exports = { registerUserService, vrfyEmailService, loginUserService, getProfileDetailsService }

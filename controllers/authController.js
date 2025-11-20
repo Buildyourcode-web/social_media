@@ -1,6 +1,6 @@
 const logger = require('../utils/logger');
 const  { registerValidation, verifyEmailValidation, loginValidation } = require('../validations/authValidation');
-const  { registerUserService, vrfyEmailService, loginUserService } = require('../services/authServices');
+const  { registerUserService, vrfyEmailService, loginUserService, getProfileDetailsService } = require('../services/authServices');
 
 const registerController = async (req, res) => {
   const userRegVal = registerValidation(req.body);
@@ -43,18 +43,14 @@ const loginController = async (req, res) => {
         }
     } else return res.status(400).send({ success: false, message: lgnVal.message });
 }
-
-
-
 const profileDetailsController = async (req, res) => {
   try {
-    // Assuming userId is coming from auth middleware (JWT)
-    const userId = req.user?.id || req.params.id;
+    const userId = req.params.id.trim(); 
 
     if (!userId) {
       return res.status(400).json({
         success: false,
-        message: "User ID is required"
+        message: "User ID is required",
       });
     }
 
@@ -63,7 +59,7 @@ const profileDetailsController = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: "User not found"
+        message: "User not found",
       });
     }
 
@@ -82,6 +78,7 @@ const profileDetailsController = async (req, res) => {
     });
   }
 };
+
 
 
 module.exports = { registerController, verifyEmailOtpController, loginController, profileDetailsController };
