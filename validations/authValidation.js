@@ -1,7 +1,7 @@
 const registerValidation = (body) => {
   const { name, email, password, phoneNo } = body;
   if (!name || !email || !password || !phoneNo ) {
-    return { status: 400, success: false, message: 'PLease provide required fields' };
+    return { status: 400, success: false, message: 'Please provide required fields' };
   } else {
     return { success: true };
   }
