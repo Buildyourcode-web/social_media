@@ -44,4 +44,44 @@ const loginController = async (req, res) => {
     } else return res.status(400).send({ success: false, message: lgnVal.message });
 }
 
-module.exports = { registerController, verifyEmailOtpController, loginController };
+
+
+const profileDetailsController = async (req, res) => {
+  try {
+    // Assuming userId is coming from auth middleware (JWT)
+    const userId = req.user?.id || req.params.id;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required"
+      });
+    }
+
+    const user = await getProfileDetailsService(userId);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile details fetched successfully",
+      data: user,
+    });
+
+  } catch (err) {
+    logger.error("Error in Profile Details API", err.message);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message,
+    });
+  }
+};
+
+
+module.exports = { registerController, verifyEmailOtpController, loginController, profileDetailsController };
