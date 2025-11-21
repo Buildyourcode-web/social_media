@@ -15,5 +15,6 @@ router.post('/login', loginController);
 
 // Profile Details || GET
 router.get("/profile/:id", authMiddleware, profileDetailsController);
+ 
 
 module.exports = router;
