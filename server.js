@@ -5,7 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
-const routes = require('./routes')
+const routes = require('./routes/index')
 
 const connectDb = require('./config/db');
 
@@ -22,9 +22,8 @@ routes.forEach(({ path, router }) => {
   app.use(`/api${path}`, router);
 });
 
-
 // port
-const PORT = process.env.port || 8080;
+const PORT = process.env.port || 4000;
 
 // database
 connectDb().then(() => {

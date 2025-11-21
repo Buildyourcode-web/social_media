@@ -4,8 +4,6 @@ const userModel = require('../models/userModel');
 const otpModel = require('../models/otpModel');
 const { sendEmail } = require('../services/emailService');
 
-// const { v4: uuidv4 } = require('uuid');
-
 const SALT_ROUNDS = 10;
 
 const generateToken = (usr) => {
