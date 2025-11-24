@@ -31,6 +31,11 @@ const updateJobService = async (jobId, data) => {
 const deleteJobService = async (jobId) => {
   const jobDel = await jobModel.findByIdAndDelete(jobId);
   return { status: 200, success: true, message: 'Job Deleted Successfully' };
-};  
+};
 
-module.exports = { jobCreateService, getAllJobsService, getJobByIdService, updateJobService, deleteJobService };
+const getJobsByUserService = async (userId) => {
+  const jobs = await jobModel.find({ createdBy: userId }).sort({ createdAt: -1 });
+  return { status: 200, success: true, message: 'Jobs retrieved successfully', data: jobs };
+};
+
+module.exports = { jobCreateService, getAllJobsService, getJobByIdService, updateJobService, deleteJobService, getJobsByUserService };

@@ -12,6 +12,7 @@ const jobSchema = new mongoose.Schema({
    salaryRange: {type: Number, required: true },
    postValidityDate: { type: Date, required: true },
    applicationLink: { type: String },
+   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // user id
 }, { timestamps: true });
 
 // exports

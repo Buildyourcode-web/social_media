@@ -7,8 +7,8 @@ const { sendEmail } = require('../services/emailService');
 const SALT_ROUNDS = 10;
 
 const generateToken = (usr) => {
-  const payload = { id: usr._id, email: usr.email };
-  return jwt.sign(payload, process.env.JWT_SECRET || 'secret', { expiresIn: '7d' });
+  const payload = { id: usr._id, email: usr.email, name: usr.name, phoneNo: usr.phoneNo };
+  return jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
 
 const registerUserService = async (data) => {
@@ -67,10 +67,25 @@ const loginUserService = async(data) => {
     createdAt: lgnUser.createdAt
   };
     return { status: 200, success: true, message: 'Login Successful', token, userData };
-}
-
-const getProfileDetailsService = async (userId) => {
-  return await userModel.findById(userId).select("-password -otp -__v");
 };
 
-module.exports = { registerUserService, vrfyEmailService, loginUserService, getProfileDetailsService }
+const usrNameCreateService = async(userId, data) => {
+  const userN = await userModel.findById(userId);
+  if(!userN) return { status: 404, success: false, message: "User not found" };
+
+  const checkUserName = await userModel.findOne({ username: data.userName });
+  if(checkUserName) return { status: 409, success: false, message: "Username already taken" };
+
+  userN.userName = data.userName;
+  await userN.save();
+
+  return { status: 200, success: true, message: "Username updated successfully", userN };
+};
+
+const userNameListService = async(userId) => {  
+  const userNLst = await userModel.findById(userId);
+  if(!userNLst) return { status: 404, success: false, message: "User not found" };
+  else return { status: 200, success: true, message: "Username fetched successfully", userNLst: userNLst.userName };
+};
+
+module.exports = { registerUserService, vrfyEmailService, loginUserService, usrNameCreateService, userNameListService }

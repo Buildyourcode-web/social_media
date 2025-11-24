@@ -16,6 +16,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(requestLogger);
+app.use("/uploads", express.static("uploads"));
 
 // routes
 routes.forEach(({ path, router }) => {

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { registerController, verifyEmailOtpController, loginController, profileDetailsController } = require('../controllers/authController');
+const { registerController, verifyEmailOtpController, loginController, usrNameCreateController, usrNameListController } = require('../controllers/authController');
 const authMiddleware = require("../middleware/authMiddleware");
 
 // routes
@@ -13,8 +13,10 @@ router.post('/verify-email-otp', verifyEmailOtpController);
 // VERIFY OTP || POST
 router.post('/login', loginController);
 
-// Profile Details || GET
-router.get("/profile/:id", authMiddleware, profileDetailsController);
- 
+// USERNAME CREATE || POST
+router.post('/create-username', authMiddleware, usrNameCreateController);
+
+// USERNAME LIST || GET
+router.get('/username-list', authMiddleware, usrNameListController);
 
 module.exports = router;

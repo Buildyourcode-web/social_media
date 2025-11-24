@@ -1,19 +1,20 @@
 const logger = require('../utils/logger');
 const { jobCreateValidation, jobUpdateValidation } = require('../validations/jobValidation');
-const { jobCreateService, getAllJobsService, getJobByIdService, updateJobService, deleteJobService } = require('../services/jobServices');
+const { jobCreateService, getAllJobsService, getJobByIdService, updateJobService, deleteJobService, getJobsByUserService } = require('../services/jobServices');
 
 const jobCreateController = async (req, res) => {
- const jobCrtVal = jobCreateValidation(req.body);
-  if (jobCrtVal.success) {
-    try {
-      const jbCrt = await jobCreateService(req.body);
-      res.status(jbCrt.status).json(jbCrt);
-    }
-    catch (err) {
-      logger.error('Error in Job Create API');
-      return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
-    }
-  } else return res.status(400).send({ success: false, message: jobCrtVal.message });
+  const  jobData = { ...req.body, createdBy: req.user.id };
+  const jobCrtVal = jobCreateValidation(jobData);
+    if (jobCrtVal.success) {
+      try {
+        const jbCrt = await jobCreateService(jobData);
+        res.status(jbCrt.status).json(jbCrt);
+      }
+      catch (err) {
+        logger.error('Error in Job Create API');
+        return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+      }
+    } else return res.status(400).send({ success: false, message: jobCrtVal.message });
 };
 
 const getAllJobsController = async (req, res) => {
@@ -51,6 +52,7 @@ const updateJobController = async (req, res) => {
     }
   } else return res.status(400).send({ success: false, message: jobUpdtVal.message });
 };
+
 const deleteJobController = async (req, res) => {
   try {
      const jbDel = await deleteJobService(req.params.id);   
@@ -60,6 +62,15 @@ const deleteJobController = async (req, res) => {
     logger.error('Error in Delete API', err);
     return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
   }
+};
+
+const getJobsByUserController = async (req, res) => {
+  try {
+    const jbByUsrId = await getJobsByUserService(req.params.userId);
+    res.status(jbByUsrId.status).json(jbByUsrId);
+  } catch (error) {
+    return res.status(500).send({ success: false, message: 'Internal Server Error', error: error.message });
+  }
 }
 
-module.exports = { jobCreateController, getAllJobsController, getSingleJobController, updateJobController, deleteJobController };
+module.exports = { jobCreateController, getAllJobsController, getSingleJobController, updateJobController, deleteJobController, getJobsByUserController };
