@@ -37,47 +37,47 @@ const updateProfileImageService = async (userId, file) => {
 };
 
 const updtUsrPrflService = async (usrId, data) => {
-  const userUp = await userModel.findById(usrId);
-  if (!userUp) {
+  const user = await userModel.findById(usrId);
+  if (!user) {
     return { status: 404, success: false, message: "User not found" };
   }
 
 //  update email
   const newEmail = data.email ? data.email.trim().toLowerCase() : null;
-  const oldEmail = userUp.email ? userUp.email.trim().toLowerCase() : null;
+  const oldEmail = user.email ? user.email.trim().toLowerCase() : null;
 
   if (newEmail && newEmail !== oldEmail) {
   const emailExists = await userModel.findOne({ email: newEmail });
   if (emailExists) {
     return { status: 409, success: false, message: "Email already in use" };
   }
-  userUp.email = newEmail;
+  user.email = newEmail;
   }
 
   // Update Phone Number
-  if (data.phoneNo && data.phoneNo !== userUp.phoneNo) {
+  if (data.phoneNo && data.phoneNo !== user.phoneNo) {
   const phoneExists = await userModel.findOne({ phoneNo: data.phoneNo });
   if (phoneExists) {
     return { status: 409, success: false, message: "Phone number already in use" };
   }
-  userUp.phoneNo = data.phoneNo;
+  user.phoneNo = data.phoneNo;
   }
 
   // Update Username
-  if (data.userName && data.userName !== userUp.userName) {
+  if (data.userName && data.userName !== user.userName) {
   const userNameExists = await userModel.findOne({ userName: data.userName });
   if (userNameExists) {
     return { status: 409, success: false, message: "Username already taken" };
   }
-  userUp.userName = data.userName;
+  user.userName = data.userName;
   }
 
-  if (data.name) userUp.name = data.name;
-  if (data.dob) userUp.dob = data.dob;
+  if (data.name) user.name = data.name;
+  if (data.dob) user.dob = data.dob;
 
-  await userUp.save();
+  await user.save();
 
-  return { status: 200, success: true, message: "User profile updated successfully", data: userUp };
+  return { status: 200, success: true, message: "User profile updated successfully", data: user };
 };
 
 const forgotPasswordService = async (data) => {
