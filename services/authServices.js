@@ -58,7 +58,7 @@ const loginUserService = async(data) => {
     if (!ok) return { status: 400,  success: false, message: 'Invalid credentials' };
 
     const token = generateToken(lgnUser);
-     const userData = {
+     const user = {
     id: lgnUser._id,
     name: lgnUser.name,
     email: lgnUser.email,
@@ -66,26 +66,26 @@ const loginUserService = async(data) => {
     isEmailVerified: lgnUser.isEmailVerified,
     createdAt: lgnUser.createdAt
   };
-    return { status: 200, success: true, message: 'Login Successful', token, userData };
+    return { status: 200, success: true, message: 'Login Successful', token, user };
 };
 
 const usrNameCreateService = async(userId, data) => {
-  const userN = await userModel.findById(userId);
-  if(!userN) return { status: 404, success: false, message: "User not found" };
+  const user = await userModel.findById(userId);
+  if(!user) return { status: 404, success: false, message: "User not found" };
 
   const checkUserName = await userModel.findOne({ username: data.userName });
   if(checkUserName) return { status: 409, success: false, message: "Username already taken" };
 
-  userN.userName = data.userName;
-  await userN.save();
+  user.userName = data.userName;
+  await user.save();
 
-  return { status: 200, success: true, message: "Username updated successfully", userN };
+  return { status: 200, success: true, message: "Username updated successfully", user };
 };
 
 const userNameListService = async(userId) => {  
-  const userNLst = await userModel.findById(userId);
-  if(!userNLst) return { status: 404, success: false, message: "User not found" };
-  else return { status: 200, success: true, message: "Username fetched successfully", userNLst: userNLst.userName };
+  const user = await userModel.findById(userId);
+  if(!user) return { status: 404, success: false, message: "User not found" };
+  else return { status: 200, success: true, message: "Username fetched successfully", user: userNLst.userName };
 };
 
 module.exports = { registerUserService, vrfyEmailService, loginUserService, usrNameCreateService, userNameListService }
