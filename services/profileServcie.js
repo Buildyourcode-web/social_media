@@ -33,7 +33,7 @@ const updateProfileImageService = async (userId, file) => {
   userD.profilePic = newImagePath;
   await userD.save();
 
-  return { status: 200, success: true, message: 'Profile image updated successfully', image: newImagePath, user: userD };
+  return { status: 200, success: true, message: 'Profile image updated successfully', image: newImagePath};
 };
 
 const updtUsrPrflService = async (usrId, data) => {
