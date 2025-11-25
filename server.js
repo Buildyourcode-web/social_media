@@ -5,7 +5,7 @@ const express = require('express');
 const cors = require('cors');
 const requestLogger = require('./middleware/requestLogger');
 const errorHandler = require('./middleware/errorHandler');
-const routes = require('./routes/index')
+const routes = require('./routes/index');
 
 const connectDb = require('./config/db');
 
@@ -42,3 +42,8 @@ connectDb().then(() => {
 
 // error handler
 app.use(errorHandler);
+
+// test route
+app.get("/", (req, res) => {
+  res.send("Server running successfully");
+});

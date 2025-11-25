@@ -1,5 +1,12 @@
 const mongoose = require('mongoose');
 
+const notificationSchema = new mongoose.Schema({
+  sender: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+  type: { type: String, enum: ["follow", "follow-back"], required: true },
+  message: { type: String, required: true },
+  isRead: { type: Boolean, default: false }
+}, { timestamps: true });
+
 // schema
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
@@ -14,7 +21,10 @@ const userSchema = new mongoose.Schema({
     aadhaar: { type: String },
     verified: { type: Boolean, default: false },
     profile: { type: Object }
-  }
+  },
+  followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+  following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+  notifications: [notificationSchema]
 }, { timestamps: true });
 
 // exports
