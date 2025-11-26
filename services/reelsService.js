@@ -32,6 +32,12 @@ const getAllReelsService = async(req, res) => {
   return { status: 201, success: true, message: "Reels Retrived Successfully", totalReels: reels.length, reels }
 };
 
+// get all reels
+const getReelsByIdService = async(userId) => {
+  const reels = await reelsModel.find({user: userId}).populate("user", "name email peofilePic").populate("comments.user", "name email profilePic").sort({ createdAt: -1 });
+  return { status: 201, success: true, message: "Reels Retrived Successfully", totalReels: reels.length, reels }
+};
+
 // like or unlike reels
 const likeReelsService = async (rlId, userId) => {
   let reel = await reelsModel.findById(rlId);
@@ -140,4 +146,4 @@ const reelsGetService = async (userId) => {
  return { status: 200, success: true, count: reels.length, reels };
 };
 
-module.exports = { reelsCreateService, getAllReelsService, likeReelsService, commentService, editCmntService, deleteCmntService, toggleCmntService, reelsSaveService, reelsGetService };
+module.exports = { reelsCreateService, getAllReelsService, likeReelsService, commentService, editCmntService, deleteCmntService, toggleCmntService, reelsSaveService, reelsGetService, getReelsByIdService };

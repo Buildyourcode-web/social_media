@@ -1,5 +1,5 @@
 const express = require('express');
-const { reelCreateController, getAllReelsController, likesReelController, commentController, editCmntController, deleteCmntController, toggleReelController, reelsSaveController, reelsGetController } = require('../controllers/reelsController');
+const { reelCreateController, getAllReelsController, getReelsByIdController, likesReelController, commentController, editCmntController, deleteCmntController, toggleReelController, reelsSaveController, reelsGetController } = require('../controllers/reelsController');
 const authMiddleware = require('../middleware/authMiddleware');
 const upload = require('../middleware/reelsUpload');
 
@@ -11,6 +11,9 @@ router.post('/create-reel', authMiddleware, upload.single('file'), reelCreateCon
 
 // GET ALL REELS || GET /api/reels/get-all-reels
 router.get('/get-all-reels', authMiddleware, getAllReelsController);
+
+// GET SPECIFIC USER REEL BY ID || GET /api/reels/:id
+router.get('/user-reels/:id',  authMiddleware, getReelsByIdController);
 
 // LIKE & UNLIKE REELS || POST
 router.post('/likes/:id', authMiddleware, likesReelController);

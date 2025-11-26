@@ -1,5 +1,6 @@
 const logger = require('../utils/logger');
-const { reelsCreateService, getAllReelsService, likeReelsService, commentService, editCmntService, deleteCmntService, toggleCmntService, reelsSaveService, reelsGetService } = require('../services/reelsService');
+const { reelsCreateService, getAllReelsService, getReelsByIdService, likeReelsService, commentService, editCmntService, deleteCmntService, toggleCmntService, reelsSaveService, reelsGetService } = require('../services/reelsService');
+const { findById } = require('../models/reelsModel');
 
 
 const reelCreateController = async (req, res) => {
@@ -16,6 +17,29 @@ const reelCreateController = async (req, res) => {
 const getAllReelsController = async (req, res) => {
     try {
         const rlsLst = await getAllReelsService();
+        res.status(rlsLst.status).json(rlsLst);
+    }
+    catch (err) {
+        logger.error('Error in Get Reels List API', err);
+        return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+    }
+};
+
+// reels by id
+const getReelsByIdController = async (req, res) => {
+  try {
+      const response = await getReelsByIdService(req.params.id);
+      res.status(response.status).json(response);
+  }
+  catch (err) {
+      logger.error('Error in Get Reels By ID API', err);
+      return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+  }
+};
+
+const getReelsByIDController = async (req, res) => {
+    try {
+        const rlsLst = await findById();
         res.status(rlsLst.status).json(rlsLst);
     }
     catch (err) {
@@ -113,4 +137,4 @@ const reelsGetController = async (req, res) => {
   }
 };
 
-module.exports = { reelCreateController, getAllReelsController, likesReelController, commentController, editCmntController, deleteCmntController, toggleReelController,  reelsSaveController, reelsGetController };
+module.exports = { reelCreateController, getAllReelsController, getReelsByIdController, likesReelController, commentController, editCmntController, deleteCmntController, toggleReelController,  reelsSaveController, reelsGetController };

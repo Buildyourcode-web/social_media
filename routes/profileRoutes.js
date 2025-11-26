@@ -1,7 +1,7 @@
 const express = require('express');
 const upload = require('../middleware/upload');
 const authMiddleware = require('../middleware/authMiddleware');
-const { profileDetailsController, updateProfileImageController, updateUserProfileController, forgotPasswordController, vrfyOtpController, rstPswdController, chngePswdController } = require('../controllers/profileController');
+const { profileDetailsController, updateProfileImageController, updateUserProfileController, forgotPasswordController, vrfyOtpController, rstPswdController, chngePswdController, visibilityController, blockUserController, blockUserListController, unblockUserController } = require('../controllers/profileController');
 
 const router = express.Router();
 
@@ -27,4 +27,15 @@ router.post('/reset-password', authMiddleware, rstPswdController);
 // CHANGE PASSWORD || PUT
 router.put('/change-password', authMiddleware, chngePswdController);
 
+// PROFILE VISIBILTY || PATCH
+router.patch('/visibility/:id', authMiddleware, visibilityController);
+
+// BLOCK || POST
+router.post('/block/:id', authMiddleware, blockUserController);
+
+// BLOCK USER LIST BASED ON ID || GET
+router.get('/block-list', authMiddleware, blockUserListController);
+
+// UNBLOCK USER || POST
+router.post('/unblock/:id', authMiddleware, unblockUserController);
 module.exports = router;

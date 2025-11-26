@@ -1,6 +1,6 @@
 const logger = require('../utils/logger');
 const { updtUsrValidation } = require('../validations/profileValidation');
-const { getProfileDetailsService, updateProfileImageService, updtUsrPrflService, forgotPasswordService, verifyOtpService, rstPswdService, chngePswdService } = require('../services/profileServcie');
+const { getProfileDetailsService, updateProfileImageService, updtUsrPrflService, forgotPasswordService, verifyOtpService, rstPswdService, chngePswdService, visibilityService, blockUserService, blockUserListService, unblockUserService } = require('../services/profileServcie');
 
 const profileDetailsController = async (req, res) => {
   try {
@@ -98,6 +98,46 @@ const chngePswdController = async (req, res) => {
     logger.error('Error in Change Password API');
     return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
   }
-}
+};
 
-module.exports = { profileDetailsController, updateProfileImageController, updateUserProfileController, forgotPasswordController, vrfyOtpController, rstPswdController, chngePswdController };
+const visibilityController = async (req, res) => {
+   try {
+    const vsbility = await visibilityService(req.user.id, req.body);
+    res.status(vsbility.status).json(vsbility);
+  } catch (err) {
+    logger.error('Error in Profile Visibility API');
+    return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+  }
+};
+ 
+const blockUserController = async (req, res) => {
+  try {
+    const response = await blockUserService(req.user.id, req.params.id);
+    res.status(response.status).json(response);
+  } catch (err) {
+    logger.error('Error in Block User API');
+    return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+  }
+};
+
+const blockUserListController = async (req, res) => {
+  try {
+    const response = await blockUserListService(req.user.id);
+    res.status(response.status).json(response);
+  } catch (err) {
+    logger.error('Error in Block User List API');
+    return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+  }
+};
+
+const unblockUserController = async (req, res) => {
+  try {
+    const response = await unblockUserService(req.user.id, req.params.id);
+    res.status(response.status).json(response);
+  } catch (err) {
+    logger.error('Error in Block User API');
+    return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+  }
+};
+
+module.exports = { profileDetailsController, updateProfileImageController, updateUserProfileController, forgotPasswordController, vrfyOtpController, rstPswdController, chngePswdController, visibilityController, blockUserController, blockUserListController, unblockUserController };

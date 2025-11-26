@@ -36,7 +36,7 @@ const registerUserService = async (data) => {
 };
 
 const vrfyEmailService = async (data) => {
-    const record = await otpModel.findOne({ email: data.email, otp: data.otp, purpose: 'email_verification' });
+    const record = await otpModel.findOne({ email: data.email, otp: Number(data.otp), purpose: 'email_verification' });
     if (!record) return { status: 400, success: false, message: 'Invalid or expired OTP' };
 
     // mark user verified

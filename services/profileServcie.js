@@ -139,4 +139,60 @@ const chngePswdService = async (usrID, data) => {
   return { status: 200, success: true, message: "Password changed successfully" };
 };
 
-module.exports = { getProfileDetailsService, updateProfileImageService, updtUsrPrflService, forgotPasswordService, verifyOtpService, rstPswdService, chngePswdService };
+const visibilityService = async (userId, data) => {
+  await userModel.findByIdAndUpdate(userId, { profileVisibility: data.profileVisibility });
+  return { status: 200, success: true, message: "Profile Visibility Updated Successfully" };
+};
+
+const blockUserService = async (loginUserId, targetUserId) => {
+  if(loginUserId === targetUserId) return { status: 400, success: false, message: "You Cannot block yourself" };
+
+  const me = await userModel.findById(loginUserId);
+  const target = await userModel.findById(targetUserId);
+
+  if (!me)
+    return { status: 404, success: false, message: "Logged-in user not found" };
+
+  if (!target)
+    return { status: 404, success: false, message: "Target user not found" }
+
+  if(me.blockedUsers.includes(targetUserId)) return { status: 200, success: true, message: "User Already Blocked" }; //if already blocked
+
+  // remove followers, following and friends
+  me.following.pull(targetUserId);
+  me.followers.pull(targetUserId);
+  me.friends.pull(targetUserId);
+
+  target.following.pull(loginUserId);
+  target.followers.pull(loginUserId);
+  target.friends.pull(loginUserId);
+
+  me.followRequests.pull(targetUserId);
+  target.followRequests.pull(loginUserId);
+
+  me.blockedUsers.push(targetUserId);
+
+  await me.save();
+  await target.save();
+
+  return { status: 200, success: true, message: "User blocked successfully" };
+};
+
+const blockUserListService = async (userId) => {
+  const user = await userModel.findById(userId).populate("blockedUsers", "name email profilePic");
+
+  return { status: 200, success: true, count: user.blockedUsers.length, blockedUsers: user.blockedUsers };
+};
+
+const unblockUserService = async (loginUserId, targetUserId) => {
+  const me = await userModel.findById(loginUserId);
+  const target = await userModel.findById(targetUserId);
+  if(!me.blockedUsers.includes(targetUserId)) return { status: 400, success: false, message: "Uer not in blocked list" };
+  
+  me.blockedUsers.pull(targetUserId);
+  await me.save();
+
+  return { status: 200, success: true, message: "User unblocked successfully", unblockedUser: { _id: target._id, name: target.name, email: target.email, profilePic: target.profilePic }};
+};
+
+module.exports = { getProfileDetailsService, updateProfileImageService, updtUsrPrflService, forgotPasswordService, verifyOtpService, rstPswdService, chngePswdService, visibilityService, blockUserService, blockUserListService, unblockUserService };

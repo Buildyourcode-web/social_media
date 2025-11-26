@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema({
   },
   followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
   following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User"}],
+  followRequests: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // follow requests
+  friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // friends
+  profileVisibility: { type: String, enum: ["public", "private", "friends"], default: "public"}, // public, private, friends
+  blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // block functionality
   notifications: [notificationSchema]
 }, { timestamps: true });
 
