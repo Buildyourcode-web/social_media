@@ -1,5 +1,5 @@
 const express = require('express');
-const { reelCreateController, getAllReelsController, getReelsByIdController, likesReelController, commentController, editCmntController, deleteCmntController, toggleReelController, reelsSaveController, reelsGetController } = require('../controllers/reelsController');
+const { reelCreateController, getAllReelsController, getReelsByIdController, likesReelController, commentController, editCmntController, deleteCmntController, toggleReelController, reelsSaveController, reelsGetController, addReelsViewController, getReelsViewController } = require('../controllers/reelsController');
 const authMiddleware = require('../middleware/authMiddleware');
 const upload = require('../middleware/reelsUpload');
 
@@ -35,5 +35,14 @@ router.post('/save/:id', authMiddleware, reelsSaveController);
 
 // GET SAVED REELS
 router.get('/saved-reels/list', authMiddleware, reelsGetController);
+
+// REEL VIEW BY USER
+router.post('/view/:id', authMiddleware, addReelsViewController);
+
+// GET VIEW COUNT
+router.get('/get-views/:id', authMiddleware, getReelsViewController);
+
+// WALLET COINS 
+router.post("/wallet/spend", authMiddleware, )
 
 module.exports = router;

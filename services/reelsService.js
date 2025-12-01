@@ -1,13 +1,41 @@
 const reelsModel = require('../models/reelsModel');
 const mongoose = require("mongoose");
 const userModel = require('../models/userModel');
+const walletModel = require('../models/walletTransaction');
 
 // reels create
 const reelsCreateService = async (userId, data = {}, file) => {
-  const filePath = file ? `/uploads/reels/${file.filename}` : null;
-  const mediaType = file.mimetype.startsWith("video/") ? "video" : "image";
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  const reelDoc = await reelsModel.create({ user: userId, description: data.description || "", mediaUrl: filePath, mediaType });
+   if (!file) {
+      await session.abortTransaction();
+      session.endSession();
+      return { status: 400, success: false, message: "Reel file is required" };
+    }
+
+  const filePath = file ? `/uploads/reels/${file.filename}` : null;
+  const mediaType = file ? (file.mimetype.startsWith("video/") ? "video" : "image") : null;
+
+  const reelArr = await reelsModel.create([{ user: userId, description: data.description || "", mediaUrl: filePath, mediaType }], { session });
+
+  const reelDoc = reelArr[0];
+
+   const wallet = await walletModel.findOneAndUpdate(
+      { user: userId }, {
+        $inc: { balance: 1 },
+        $push: {
+          transactions: {
+            type: "credit",
+            amount: 1,
+            reason: "Reel Uploaded"
+          }
+        } },
+      { new: true, upsert: true, session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
 
   // Populate user details
   let reel = await reelsModel.findById(reelDoc._id).populate("user", "name email profilePic").lean(); // Convert to plain JS object
@@ -22,7 +50,7 @@ const reelsCreateService = async (userId, data = {}, file) => {
     reel.mediaUrl = `${BASE_URL}${reel.mediaUrl}`;
   }
 
-  return { status: 201, success: true, message: "Reel created successfully", reel, };
+  return { status: 201, success: true, message: "Reel created successfully", reel, wallet };
 };
 
 // get all reels
@@ -146,4 +174,45 @@ const reelsGetService = async (userId) => {
  return { status: 200, success: true, count: reels.length, reels };
 };
 
-module.exports = { reelsCreateService, getAllReelsService, likeReelsService, commentService, editCmntService, deleteCmntService, toggleCmntService, reelsSaveService, reelsGetService, getReelsByIdService };
+// add reels viewed by specific user service
+const addReelsViewService = async (userId, reelId) => {
+  const updtReel = await reelsModel.findByIdAndUpdate({  _id: reelId, views: { $ne: userId }  }, { $addToSet: { views: userId }, $inc: { viewCount: 1 } },  { new: true });  // $ne - dublicate removes, $addToSet - add if only exists, $inc - auto increment
+  return { status: 200, success: true, message: updtReel ? 'Viewed Count' : 'User already Viewed', viewCount: updtReel ? updtReel.viewCount : undefined };
+};
+
+// get reels viewed by specific user service
+const getReelsViewService = async (reelId) => {
+  if (!reelId) {
+    return res.status(404).json({ success: false, message: "Reel not found" });
+  }
+
+  const vwReel = await reelsModel.findById(reelId).select("viewCount");
+  return { status: 200, success: true, message: "Retrived Reels", views: vwReel.viewCount };
+};
+
+const walletCoinsService = async (userId, amount, itemName) => {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  const wallet = await walletModel.findOne({ user: userId }).session(session);
+  if (!wallet) {
+    throw new Error("Wallet not found");
+  }
+
+  if (wallet.balance < amount) {
+    throw new Error("Not enough coins to purchase");
+  }
+
+  wallet.balance -= amount;
+
+  wallet.transactions.push({ type: "debit", amount, reason: `Purchased: ${itemName}` });
+
+  await wallet.save({ session });
+
+  await session.commitTransaction();
+  session.endSession();
+
+  return { status: 200, success: true,  message: "Purchase successful", balance: wallet.balance };
+};
+
+module.exports = { reelsCreateService, getAllReelsService, likeReelsService, commentService, editCmntService, deleteCmntService, toggleCmntService, reelsSaveService, reelsGetService, getReelsByIdService, addReelsViewService, getReelsViewService, walletCoinsService };

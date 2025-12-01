@@ -18,7 +18,10 @@ const reelsSchema = new mongoose.Schema({
       updatedAt: { type: Date }
     }],  // Comments on the reel
     isCommentsEnabled: { type: Boolean, default: true },  // comments enabled
-    savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],  // Users who saved the reel
-}, { timestamps: true });
+    savedBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],  // Users who saved the reel,
+    location: { type: { type: String, enum: ['Point'], default: 'Point' }, coordinates: { type: [Number], default: [0, 0] } }, // [longitude, latitude] 
+    views: [ { type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // users view avoid dublicate
+    viewCount: { type: Number, default: 0 }, // view count 
+}, { timestamps: true }); 
 
 module.exports = mongoose.model('Reel', reelsSchema);

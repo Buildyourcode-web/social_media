@@ -28,7 +28,9 @@ const userSchema = new mongoose.Schema({
   friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // friends
   profileVisibility: { type: String, enum: ["public", "private", "friends"], default: "public"}, // public, private, friends
   blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // block functionality
-  notifications: [notificationSchema]
+  notifications: [notificationSchema],
+  walletBalance: { type: Number, default: 0 }, // coins
+  location: { type: { type: String, enum: ['Point'], default: 'Point' }, coordinates: { type: [Number], default: [0, 0] } }, // [longitude, latitude]
 }, { timestamps: true });
 
 // exports

@@ -1,5 +1,5 @@
 const logger = require('../utils/logger');
-const { reelsCreateService, getAllReelsService, getReelsByIdService, likeReelsService, commentService, editCmntService, deleteCmntService, toggleCmntService, reelsSaveService, reelsGetService } = require('../services/reelsService');
+const { reelsCreateService, getAllReelsService, getReelsByIdService, likeReelsService, commentService, editCmntService, deleteCmntService, toggleCmntService, reelsSaveService, reelsGetService, addReelsViewService, getReelsViewService, walletCoinsService } = require('../services/reelsService');
 const { findById } = require('../models/reelsModel');
 
 
@@ -137,4 +137,39 @@ const reelsGetController = async (req, res) => {
   }
 };
 
-module.exports = { reelCreateController, getAllReelsController, getReelsByIdController, likesReelController, commentController, editCmntController, deleteCmntController, toggleReelController,  reelsSaveController, reelsGetController };
+// add reels viewed by specific user controller
+const addReelsViewController = async (req, res) => {
+  try {
+    const response = await addReelsViewService(req.user.id, req.params.id);
+    return res.status(response.status).json(response);
+  } catch (err) {
+    logger.error("Error in ADD Reel View API", err);
+    return res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
+  }
+};
+
+// get reels viewed by specific user controller
+const getReelsViewController = async (req, res) => {
+  try {
+    const response = await getReelsViewService(req.params.id);
+    return res.status(response.status).json(response);
+  } catch (err) {
+    logger.error("Error in Get Reel View API", err);
+    return res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
+  }
+};
+
+// wallet coins
+const walletCoinsController = async (req, res) => {
+ try {
+    const { userId, amount, itemName } = req.body;
+
+    const response = await walletCoinsService(userId, amount, itemName);
+    return res.status(response.status).json(response);
+  } catch (err) {
+    logger.error("Error in Get Reel View API", err);
+    return res.status(500).json({ success: false, message: "Internal Server Error", error: err.message });
+  }
+};
+
+module.exports = { reelCreateController, getAllReelsController, getReelsByIdController, likesReelController, commentController, editCmntController, deleteCmntController, toggleReelController,  reelsSaveController, reelsGetController, addReelsViewController, getReelsViewController, walletCoinsController };
