@@ -1,9 +1,10 @@
 const mongoose = require('mongoose');
 
 const otpSchema = new mongoose.Schema({
-    email: { type: String, required: true, unique: true },
+    email: { type: String, required: true },
     otp: { type: String, required: true },
-    purpose: { type: String, enum: ['email_verification', 'password_reset'], default: 'email_verification' },
+    purpose: { type: String, enum: ['email_verification', 'password_reset', 'two_factor'], default: 'email_verification' },
+    otpHash: { type: String },
     expiresAt: { type: Date, required: true }   
 }, { timestamps: true });
 

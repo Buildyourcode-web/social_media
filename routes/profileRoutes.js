@@ -1,7 +1,7 @@
 const express = require('express');
 const upload = require('../middleware/upload');
 const authMiddleware = require('../middleware/authMiddleware');
-const { profileDetailsController, updateProfileImageController, updateUserProfileController, forgotPasswordController, vrfyOtpController, rstPswdController, chngePswdController, visibilityController, blockUserController, blockUserListController, unblockUserController } = require('../controllers/profileController');
+const { profileDetailsController, updateProfileImageController, updateUserProfileController, forgotPasswordController, vrfyOtpController, rstPswdController, chngePswdController, visibilityController, blockUserController, blockUserListController, unblockUserController, twofaSendOtpController, twofaVerifyOtpController } = require('../controllers/profileController');
 
 const router = express.Router();
 
@@ -38,4 +38,11 @@ router.get('/block-list', authMiddleware, blockUserListController);
 
 // UNBLOCK USER || POST
 router.post('/unblock/:id', authMiddleware, unblockUserController);
+
+// SEND OTP FOR 2FA
+router.post('/enabled/send-otp', authMiddleware, twofaSendOtpController);
+
+// VERIFY OTP FOR 2FA
+router.post('/enabled/verify-otp', authMiddleware, twofaVerifyOtpController);
+
 module.exports = router;

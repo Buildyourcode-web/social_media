@@ -195,4 +195,32 @@ const unblockUserService = async (loginUserId, targetUserId) => {
   return { status: 200, success: true, message: "User unblocked successfully", unblockedUser: { _id: target._id, name: target.name, email: target.email, profilePic: target.profilePic }};
 };
 
-module.exports = { getProfileDetailsService, updateProfileImageService, updtUsrPrflService, forgotPasswordService, verifyOtpService, rstPswdService, chngePswdService, visibilityService, blockUserService, blockUserListService, unblockUserService };
+const twofaSendOtpService = async (userId) => {
+  const user = await userModel.findById(userId);
+  if(!user) return { status: 404, success: false, message: "User Not Found" };
+
+  if(user.twoFactorEnabled) return { status: 401, success: false, message: "2FA already enabled" };
+
+  //  // generate email OTP
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const otpHash = await bcrypt.hash(otp, 10);
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+  // // remove old otp (important)
+  await otpModel.deleteMany({ userId });
+
+  await otpModel.create({ email: user.email, otp, purpose: 'two_factor', otpHash, expiresAt });  
+  // // send OTP email
+  await sendEmail({ to: user.email, subject: 'Two Factor Authentication OTP', text: `Your OTP for 2FA is ${otp}. Expires in 10 minutes.` });      
+  return { status: 200, success: true, message: 'OTP sent to email for 2FA' };
+};
+
+const twofaVerifyOtpService = async (data) => {
+  const otpRecord = await otpModel.findOne({ email: data.email, otp: data.otp, purpose: 'two_factor', expiresAt: { $gt: new Date() } });
+  if (!otpRecord) {
+    return { status: 400, success: false, message: 'Invalid or expired OTP' };  
+  }
+  return { status: 200, success: true, message: 'Two-factor authentication enabled' };
+};
+
+module.exports = { getProfileDetailsService, updateProfileImageService, updtUsrPrflService, forgotPasswordService, verifyOtpService, rstPswdService, chngePswdService, visibilityService, blockUserService, blockUserListService, unblockUserService, twofaSendOtpService, twofaVerifyOtpService };

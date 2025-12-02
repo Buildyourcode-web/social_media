@@ -1,6 +1,6 @@
 const logger = require('../utils/logger');
 const { updtUsrValidation } = require('../validations/profileValidation');
-const { getProfileDetailsService, updateProfileImageService, updtUsrPrflService, forgotPasswordService, verifyOtpService, rstPswdService, chngePswdService, visibilityService, blockUserService, blockUserListService, unblockUserService } = require('../services/profileServcie');
+const { getProfileDetailsService, updateProfileImageService, updtUsrPrflService, forgotPasswordService, verifyOtpService, rstPswdService, chngePswdService, visibilityService, blockUserService, blockUserListService, unblockUserService, twofaSendOtpService, twofaVerifyOtpService } = require('../services/profileServcie');
 
 const profileDetailsController = async (req, res) => {
   try {
@@ -140,4 +140,24 @@ const unblockUserController = async (req, res) => {
   }
 };
 
-module.exports = { profileDetailsController, updateProfileImageController, updateUserProfileController, forgotPasswordController, vrfyOtpController, rstPswdController, chngePswdController, visibilityController, blockUserController, blockUserListController, unblockUserController };
+const twofaSendOtpController = async (req, res) => {
+  try {
+    const sendOtp = await twofaSendOtpService(req.user.id);
+    res.status(sendOtp.status).json(sendOtp);
+  } catch (err) {
+    logger.error('Error in 2FA SEND OTP API');
+    return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+  }
+};
+
+const twofaVerifyOtpController = async (req, res) => {
+  try {
+    const verifyOtp = await twofaVerifyOtpService(req.body);
+    res.status(verifyOtp.status).json(verifyOtp);
+  } catch (err) {
+    logger.error('Error in 2FA VERIFY OTP API');
+    return res.status(500).send({ success: false, message: 'Internal Server Error', error: err.message });
+  }
+};
+
+module.exports = { profileDetailsController, updateProfileImageController, updateUserProfileController, forgotPasswordController, vrfyOtpController, rstPswdController, chngePswdController, visibilityController, blockUserController, blockUserListController, unblockUserController, twofaSendOtpController, twofaVerifyOtpController };

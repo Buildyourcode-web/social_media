@@ -31,6 +31,7 @@ const userSchema = new mongoose.Schema({
   notifications: [notificationSchema],
   walletBalance: { type: Number, default: 0 }, // coins
   location: { type: { type: String, enum: ['Point'], default: 'Point' }, coordinates: { type: [Number], default: [0, 0] } }, // [longitude, latitude]
+  twoFactorEnabled: { type: Boolean, default: false }, // initially off
 }, { timestamps: true });
 
 // exports
